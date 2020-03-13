@@ -5,7 +5,7 @@ using System.Collections;
 
 namespace MyHashSetImplement
 {
-    class MyHashset<T> : IEnumerable
+    class MyHashset<T> : IEnumerable<T>
     {
         private List<Bucket<T>> _buckets;
         public MyHashset()
@@ -48,7 +48,14 @@ namespace MyHashSetImplement
 
         public IEnumerator GetEnumerator()
         {
-            return _buckets.GetEnumerator();
+            //return _buckets.GetEnumerator();
+            foreach(Bucket<T> bucket in _buckets)
+            {
+                foreach(T item in bucket._buckets)
+                {
+                    yield return item;
+                }
+            }
         }
 
         public void printHashSet()
@@ -62,6 +69,11 @@ namespace MyHashSetImplement
                 }
                 Console.WriteLine();
             }
+        }
+
+        IEnumerator<T> IEnumerable<T>.GetEnumerator()
+        {
+            return (IEnumerator<T>)GetEnumerator();
         }
     }
 }

@@ -15,9 +15,9 @@ namespace MyHashSetImplement
             hashset.add(5);
             hashset.printHashSet();
 
-            foreach(Bucket<int> item in hashset)
+            foreach(int item in hashset)
             {
-                item.printBucket();
+                Console.WriteLine(item);
             }
             Console.ReadKey();
         }
