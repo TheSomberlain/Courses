@@ -53,18 +53,19 @@ namespace My_List
         }
         public void removeAt(int index)
         {
-            if (index < 0 || index >= _arr.Length) throw new Exception();
+            if (index < 0 || index >= this._counter) throw new Exception();
             if (index > 0)
             {
                 Array.Copy(_arr, 0, _arr, 0, index);
             }
             if (index < _arr.Length - 1)
                 Array.Copy(_arr, index + 1, _arr, index, _arr.Length - index - 1);
+            _counter--;
 
         }
         public int indexOf(T item)
         {
-            for(int i =0; i < _arr.Length; i++)
+            for(int i =0; i < this._counter; i++)
             {
                 if (item.Equals(_arr[i])) return i;
             }
@@ -75,7 +76,13 @@ namespace My_List
             _arr = null;
         }
 
-        public IEnumerator GetEnumerator() => _arr.GetEnumerator();
+        public IEnumerator GetEnumerator()
+        {
+            for (int i = 0; i < this._counter; i++)
+            {
+                yield return _arr[i];
+            }
+        }
 
         public bool MoveNext()
         {
