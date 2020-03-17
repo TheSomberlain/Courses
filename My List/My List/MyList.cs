@@ -11,6 +11,10 @@ namespace My_List
         private T[] _arr;
         private int _counter;
         private int _i = -1;
+        public delegate void OnAdded(string s);
+        public event OnAdded log;
+        public delegate void OnRemove(int num);
+        public event OnRemove send;
         public MyList()
         {
             _arr = new T[_capacity];
@@ -47,9 +51,12 @@ namespace My_List
             {
                 Array.Resize(ref _arr, 2 * _capacity);
                 _capacity *= 2;
+                
             }
             _arr[_counter] = element;
             _counter++;
+            log($"Added {element}");
+
         }
         public void removeAt(int index)
         {
@@ -61,6 +68,7 @@ namespace My_List
             if (index < _arr.Length - 1)
                 Array.Copy(_arr, index + 1, _arr, index, _arr.Length - index - 1);
             _counter--;
+            send?.Invoke(index);
 
         }
         public int indexOf(T item)
@@ -100,6 +108,13 @@ namespace My_List
         public void Reset()
         {
             _i = -1;
+        }
+        public IEnumerable<T> Filter(Predicate<T> predicate)
+        {
+            for (int i = 0; i < this._counter; i++)
+            {
+                if (predicate(_arr[i])) yield return _arr[i];
+            }
         }
     }
 }
