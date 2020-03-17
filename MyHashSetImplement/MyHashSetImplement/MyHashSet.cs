@@ -5,7 +5,7 @@ using System.Collections;
 
 namespace MyHashSetImplement
 {
-    class MyHashset<T> : IEnumerable<T>
+    public class MyHashset<T> : IEnumerable<T>
     {
         private List<Bucket<T>> _buckets;
         public MyHashset()
@@ -33,6 +33,10 @@ namespace MyHashSetImplement
                 bucket.add(element);
                 _buckets.Add(bucket);
             }
+        }
+        public void Clear()
+        {
+            _buckets.Clear();
         }
         public bool contains(T element)
         {
@@ -75,5 +79,23 @@ namespace MyHashSetImplement
         {
             return (IEnumerator<T>)GetEnumerator();
         }
+        public void ForEach(Action<T> action)
+        {
+            foreach (Bucket<T> bucket in _buckets)
+            {
+                bucket._buckets.ForEach(action);
+            }
+        }
+        public void Map(Func<T,T> func)
+        {
+            foreach (Bucket<T> bucket in _buckets)
+            {
+                for (int i = 0; i < bucket._buckets.Count; i++)
+                {
+                    bucket._buckets[i] = func(bucket._buckets[i]);
+                }
+            }
+        }
+        
     }
 }
