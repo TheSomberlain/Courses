@@ -8,11 +8,13 @@ namespace MyHashSetImplement
     public class MyHashset<T> : IEnumerable<T>
     {
         private List<Bucket<T>> _buckets;
+        public event EventHandler onAdded;
+        public event EventHandler onClear;
         public MyHashset()
         {
             _buckets = new List<Bucket<T>>();
         }
-        public void add(T element)
+        public void put(T element)
         {
             int hash = element.GetHashCode();
             foreach (Bucket<T> bucket in _buckets)
@@ -32,11 +34,17 @@ namespace MyHashSetImplement
                 Bucket<T> bucket = new Bucket<T>(hash);
                 bucket.add(element);
                 _buckets.Add(bucket);
+                onAdded?.Invoke(this,EventArgs.Empty);
             }
+        }
+        public void Add(T item)
+        {
+            put(item);
         }
         public void Clear()
         {
             _buckets.Clear();
+            onClear?.Invoke(this,EventArgs.Empty);
         }
         public bool contains(T element)
         {

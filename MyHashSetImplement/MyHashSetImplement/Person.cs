@@ -4,7 +4,7 @@ using System.Text;
 
 namespace MyHashSetImplement
 {
-    class Person
+    public class Person
     {
         private int _age;
         private string _name;
