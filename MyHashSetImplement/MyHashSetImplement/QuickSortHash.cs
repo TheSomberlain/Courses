@@ -35,23 +35,23 @@ namespace MyHashSetImplement
         {
             T temp;
             T p = sourceList[right];
-            int i = left - 1;
+            int i = left;
 
-            for (int j = left; j <= right - 1; j++)
+            for (int j = left; j < right; j++)
             {
                 if (compare(p,sourceList[j]) || sourceList[j].Equals(p))
-                {
-                    i++;
+                {                             
                     temp = sourceList[i];
                     sourceList[i] = sourceList[j];
                     sourceList[j] = temp;
+                    i++;
                 }
             }
 
-            temp = sourceList[i + 1];
-            sourceList[i + 1] = sourceList[right];
+            temp = sourceList[i];
+            sourceList[i] = sourceList[right];
             sourceList[right] = temp;
-            return i + 1;
+            return i;
 
         }
     }
