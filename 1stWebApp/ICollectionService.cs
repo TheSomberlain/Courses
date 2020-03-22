@@ -10,5 +10,8 @@ namespace _1stWebApp
         void add(T elem);
         void remove(T elem);
         string view(T elem);
+        string viewAll();
+        void removeAll(string name);
+        IEnumerable<Student> GetStudents(string name);
     }
 }

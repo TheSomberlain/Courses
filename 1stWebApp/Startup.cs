@@ -33,6 +33,7 @@ namespace _1stWebApp
 
             app.Use(async (context, next) => {
                 await next.Invoke();
+                
             });
             app.Map("/students/add", students => {
                 students.MapWhen(context =>
@@ -47,28 +48,51 @@ namespace _1stWebApp
                         string name = context.Request.Query["name"];
                         Student student = new Student((byte)age,name);
                         st.add(student);
+                        await context.Response.WriteAsync("Successfully added.");
                     });        
                 }); ;
             });
-            
-      /*      app.Map("/students/view/{name}", students => {
+
+            app.Map("/students/view", students => {
+
+                students.Run(async context => {
+                    string path = context.Request.Path.Value.ToString();
+                    string name = path.Replace("/", "");
+                    string reponseString = "";
+                    if (name == "")
+                    {
+                        reponseString = st.viewAll();
+                        await context.Response.WriteAsync(reponseString);
+                        return;
+                    }
+                    IEnumerable<Student> list = st.GetStudents(name);
+                    foreach(Student item in list)
+                    {
+                        reponseString += st.view(item);
+                    }
+                    await context.Response.WriteAsync(reponseString);
+                });
+            });
+            app.Map("/students/remove", students => {
                 students.MapWhen(context =>
                 {
-                    return context.Request.Query.;
+                    return context.Request.Query.ContainsKey("name");
                 },
                 handle => {
                     handle.Run(async context =>
                     {
-                        string queryName = context.Request.Query["age"];
-                        int age = Int32.Parse(queryName);
                         string name = context.Request.Query["name"];
-                        Student student = new Student((byte)age, name);
-                        st.add(student);
+                        st.removeAll(name);
+                        await context.Response.WriteAsync("Successfully removed.");
                     });
                 }); ;
-            });*/
+            });
             app.Run(async (context) =>
             {
+                st.add(new Student(12, "Kolya"));
+                st.add(new Student(13, "Vasya"));
+                st.add(new Student(14, "Lyosha"));
+                st.add(new Student(15, "Miha"));
                 await context.Response.WriteAsync(myLogger.WriteConsole("smmth"));
             });
 

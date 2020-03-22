@@ -55,8 +55,12 @@ namespace _1stWebApp
             }
             _arr[_counter] = element;
             _counter++;
-            log($"Added {element}");
+            //log($"Added {element}");
 
+        }
+        public void Add (T element)
+        {
+            add(element);
         }
         public void removeAt(int index)
         {
@@ -68,7 +72,7 @@ namespace _1stWebApp
             if (index < _arr.Length - 1)
                 Array.Copy(_arr, index + 1, _arr, index, _arr.Length - index - 1);
             _counter--;
-            send?.Invoke(index);
+           // send?.Invoke(index);
 
         }
         public int indexOf(T item)
