@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Newtonsoft.Json;
 
 namespace _1stWebApp
 {
@@ -73,19 +74,10 @@ namespace _1stWebApp
                 students.Run(async context => {
                     string path = context.Request.Path.Value.ToString();
                     string name = path.Replace("/", "");
-                    string reponseString = "";
-                    if (name == "")
-                    {
-                        reponseString = st.viewAll();
-                        await context.Response.WriteAsync(reponseString);
-                        return;
-                    }
                     IEnumerable<Student> list = st.GetStudents(name);
-                    foreach(Student item in list)
-                    {
-                        reponseString += st.view(item);
-                    }
-                    await context.Response.WriteAsync(reponseString);
+                    string responseString = JsonConvert.SerializeObject(list, Formatting.Indented);
+                    context.Response.ContentType = "application/json";
+                    await context.Response.WriteAsync(responseString);
                 });
             });
             app.Map("/students/remove", students => {

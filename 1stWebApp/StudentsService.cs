@@ -42,7 +42,7 @@ namespace _1stWebApp
         {
             foreach(Student student in list)
             {
-                if (student.Name.Equals(name)) yield return student;
+                if (student.Name.Equals(name) || name == "") yield return student;
             }
         }
   
