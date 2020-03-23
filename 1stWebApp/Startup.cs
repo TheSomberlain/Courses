@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Web;
 using Microsoft.AspNetCore.Builder;
@@ -32,9 +33,22 @@ namespace _1stWebApp
             app.UseRouting();
 
             app.Use(async (context, next) => {
-                await next.Invoke();
+
+                try
+                {
+                    await next.Invoke();
+                }
+                catch(Exception ex)
+                {
+                    await context.Response.WriteAsync("Error");
+                    myLogger.WriteConsole(ex.Message);
+                    myLogger.WriteFile(ex.Message);
+                }
                 
             });
+            /*app.Use(async (context,next) => {
+                if (context.Request.Path.Value.EndsWith("error")) throw new Exception("Exception middleware triggered");
+            });*/
             app.Map("/students/add", students => {
                 students.MapWhen(context =>
                 {
@@ -46,6 +60,7 @@ namespace _1stWebApp
                         string queryName = context.Request.Query["age"];
                         int age = Int32.Parse(queryName);
                         string name = context.Request.Query["name"];
+                        if (!Regex.IsMatch(name, @"^[a-zA-Z]+$") || !Char.IsUpper(name.First())) throw new Exception("Invalid Name");
                         Student student = new Student((byte)age,name);
                         st.add(student);
                         await context.Response.WriteAsync("Successfully added.");
