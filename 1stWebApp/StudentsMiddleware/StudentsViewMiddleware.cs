@@ -19,8 +19,8 @@ namespace _1stWebApp.StudentsMiddleware
         public async Task InvokeAsync(HttpContext context, MyDbContext db)
         {
             string path = context.Request.Path.Value.ToString();
-            string name = path.Replace("/", ""); 
-            IEnumerable<Student> list = db.Students.Where( x => x.Name == name);
+            string name = path.Replace("/", "");
+            IEnumerable<Student> list = db.Students.Where( x => name == "" ? true : x.Name == name);
             string responseString = JsonConvert.SerializeObject(list, Formatting.Indented);
             context.Response.ContentType = "application/json";
             await context.Response.WriteAsync(responseString);
