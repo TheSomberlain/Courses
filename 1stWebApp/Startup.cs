@@ -11,17 +11,27 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Newtonsoft.Json;
 using _1stWebApp.StudentsMiddleware;
+using Microsoft.Extensions.Configuration;
+using Microsoft.EntityFrameworkCore;
 
 namespace _1stWebApp
 {
     public class Startup
     {
+        private readonly IConfiguration _configuration;
+
+        public Startup(IConfiguration configuration)
+        {
+            _configuration = configuration;
+        }
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddSingleton<IMyLogger, MyLogger>();
-            services.AddSingleton<ICollectionService<Student>, StudentsService>();
+            services.AddDbContext<MyDbContext>(options =>
+            {
+                options.UseNpgsql("Host = localhost; Database = postgres; Username = postgres; Password = postgres");
+            });
         }
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IMyLogger myLogger, ICollectionService<Student> st)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())
             {
@@ -39,8 +49,7 @@ namespace _1stWebApp
                 catch(Exception ex)
                 {
                     await context.Response.WriteAsync("Error");
-                    myLogger.WriteConsole(ex.Message);
-                    myLogger.WriteFile(ex.Message);
+
                 }
                 
             });
@@ -62,11 +71,12 @@ namespace _1stWebApp
             });
             app.Run(async (context) =>
             {
-                st.add(new Student(12, "Kolya"));
+                
+                /*st.add(new Student(12, "Kolya"));
                 st.add(new Student(13, "Vasya"));
                 st.add(new Student(14, "Lyosha"));
-                st.add(new Student(15, "Miha"));
-                await context.Response.WriteAsync(myLogger.WriteConsole("smmth"));
+                st.add(new Student(15, "Miha"));*/
+                await context.Response.WriteAsync("smmth");
             });
 
         }
