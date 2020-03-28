@@ -30,6 +30,8 @@ namespace _1stWebApp
             {
                 options.UseNpgsql("Host = localhost; Database = postgres; Username = postgres; Password = postgres");
             });
+            services.AddMvc();
+            services.AddControllers();
         }
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
@@ -53,21 +55,25 @@ namespace _1stWebApp
                 }
                 
             });
-            app.Map("/students", students => {
-                students.MapWhen(context => {
-                    return context.Request.Query.ContainsKey("name")
-                        && context.Request.Query.ContainsKey("age") 
-                        && context.Request.Path.Value.ToString() == "/add";
-                }, a => a.UseMiddleware<StudentsAddMiddleware>());
+            /* app.Map("/students", students => {
+                 students.MapWhen(context => {
+                     return context.Request.Query.ContainsKey("name")
+                         && context.Request.Query.ContainsKey("age") 
+                         && context.Request.Path.Value.ToString() == "/add";
+                 }, a => a.UseMiddleware<StudentsAddMiddleware>());
 
-                students.Map("/view", a => {
-                    a.UseMiddleware<StudentsViewMiddleware>();
-                });
+                 students.Map("/view", a => {
+                     a.UseMiddleware<StudentsViewMiddleware>();
+                 });
 
-                students.MapWhen(context => {
-                return context.Request.Path.Value.ToString() == "/remove"
-                    && context.Request.Query.ContainsKey("name");
-                }, a => a.UseMiddleware<SudentsRemoveMiddleware>());
+                 students.MapWhen(context => {
+                 return context.Request.Path.Value.ToString() == "/remove"
+                     && context.Request.Query.ContainsKey("name");
+                 }, a => a.UseMiddleware<SudentsRemoveMiddleware>());
+             });*/
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapControllers();
             });
             app.Run(async (context) =>
             {
