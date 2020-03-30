@@ -11,10 +11,11 @@ using _1stWebApp.utils.reflect;
 namespace _1stWebApp.Controllers
 {
     [Route("api/[controller]")]
-    public class StudentController : ControllerBase
+    public class TeacherController : ControllerBase
     {
+
         private readonly MyDbContext db;
-        public StudentController(MyDbContext context)
+        public TeacherController(MyDbContext context)
         {
             db = context;
         }
@@ -24,12 +25,12 @@ namespace _1stWebApp.Controllers
         {
             if (id == null)
             {
-                var items = db.Students.ToArray();
+                var items = db.Teachers.ToArray();
                 return Ok(items);
             }
             else
             {
-                var st = await db.Students.FindAsync(id);
+                var st = await db.Teachers.FindAsync(id);
                 return Ok(st);
             }
         }
@@ -39,11 +40,12 @@ namespace _1stWebApp.Controllers
         {
             try
             {
-                var st = await db.Students.FindAsync(id);
+                var st = await db.Teachers.FindAsync(id);
                 db.Remove(st);
                 await db.SaveChangesAsync();
                 return Ok();
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 Console.WriteLine(ex.Message);
                 return BadRequest();
@@ -51,27 +53,27 @@ namespace _1stWebApp.Controllers
         }
 
         [HttpPost("create")]
-        public async Task<IActionResult> Create([FromForm] int? score, string name)
+        public async Task<IActionResult> Create([FromForm] string discipline, string name)
         {
-            if (score == null || name == null) return StatusCode(409);
-            var st = new Student { Score = (int)score, Name = name };
-            db.Students.Add(st);
+            if (discipline == null || name == null) return StatusCode(409);
+            var st = new Teacher { Discipline = discipline, Name = name };
+            db.Teachers.Add(st);
             await db.SaveChangesAsync();
             return StatusCode(201, st);
         }
 
         [HttpPut("update/{id}")]
-        public async Task<IActionResult> Update(int id, [FromForm] StudentModel model)
+        public async Task<IActionResult> Update(int id, [FromForm] TeacherModel model)
         {
-            if (model == null || model.Score == null || model.Name == null) return StatusCode(409);
+            if (model == null || model.Discipline == null || model.Name == null) return StatusCode(409);
             try
             {
-                var teacher = await db.Teachers.FindAsync(model.TeacherId);
-                var st = new Student { Id = id, Name = model.Name, Score = (int)model.Score, Teacher = teacher  };
-                db.Students.Update(st);
+                var st = new Teacher { Id = id, Name = model.Name, Discipline = model.Discipline };
+                db.Teachers.Update(st);
                 await db.SaveChangesAsync();
                 return Ok(st);
-            } catch (Exception e)
+            }
+            catch (Exception e)
             {
                 Console.WriteLine(e.Message);
                 return StatusCode(500);
@@ -81,17 +83,16 @@ namespace _1stWebApp.Controllers
         [HttpPatch("update/{id}")]
         public async Task<IActionResult> UpdatePartionally(int id, [FromForm] StudentModel model)
         {
-            if (model == null) return StatusCode(408);
+            if (model == null) return StatusCode(409);
             try
-            {              
-                var st = await db.Students.FindAsync(id);
-                Reflection.UpdateEntity(st,model);
-                Teacher teacher = null;
-                if (model.TeacherId.HasValue) teacher = await db.Teachers.FindAsync(model.TeacherId.Value); 
-                db.Students.Update(st);
+            {
+                var st = await db.Teachers.FindAsync(id);
+                Reflection.UpdateEntity(st, model);
+                db.Teachers.Update(st);
                 await db.SaveChangesAsync();
                 return Ok(st);
-            }catch(Exception e)
+            }
+            catch (Exception e)
             {
                 Console.WriteLine(e.Message);
                 return StatusCode(409);

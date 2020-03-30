@@ -43,7 +43,6 @@ namespace _1stWebApp
             app.UseRouting();
 
             app.Use(async (context, next) => {
-
                 try
                 {
                     await next.Invoke();
@@ -52,25 +51,9 @@ namespace _1stWebApp
                 {
                     await context.Response.WriteAsync("Error");
 
-                }
-                
+                }              
             });
-            /* app.Map("/students", students => {
-                 students.MapWhen(context => {
-                     return context.Request.Query.ContainsKey("name")
-                         && context.Request.Query.ContainsKey("age") 
-                         && context.Request.Path.Value.ToString() == "/add";
-                 }, a => a.UseMiddleware<StudentsAddMiddleware>());
 
-                 students.Map("/view", a => {
-                     a.UseMiddleware<StudentsViewMiddleware>();
-                 });
-
-                 students.MapWhen(context => {
-                 return context.Request.Path.Value.ToString() == "/remove"
-                     && context.Request.Query.ContainsKey("name");
-                 }, a => a.UseMiddleware<SudentsRemoveMiddleware>());
-             });*/
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();

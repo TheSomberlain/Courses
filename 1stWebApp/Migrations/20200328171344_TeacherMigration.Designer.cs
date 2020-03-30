@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using _1stWebApp;
@@ -9,9 +10,10 @@ using _1stWebApp;
 namespace _1stWebApp.Migrations
 {
     [DbContext(typeof(MyDbContext))]
-    partial class MyDbContextModelSnapshot : ModelSnapshot
+    [Migration("20200328171344_TeacherMigration")]
+    partial class TeacherMigration
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -32,12 +34,12 @@ namespace _1stWebApp.Migrations
                     b.Property<int>("Score")
                         .HasColumnType("integer");
 
-                    b.Property<int?>("TeacherId")
+                    b.Property<int?>("teacherId")
                         .HasColumnType("integer");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("TeacherId");
+                    b.HasIndex("teacherId");
 
                     b.ToTable("Students");
                 });
@@ -57,14 +59,14 @@ namespace _1stWebApp.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Teachers");
+                    b.ToTable("Teacher");
                 });
 
             modelBuilder.Entity("_1stWebApp.Entities.Student", b =>
                 {
-                    b.HasOne("_1stWebApp.Entities.Teacher", "Teacher")
+                    b.HasOne("_1stWebApp.Entities.Teacher", "teacher")
                         .WithMany()
-                        .HasForeignKey("TeacherId");
+                        .HasForeignKey("teacherId");
                 });
 #pragma warning restore 612, 618
         }

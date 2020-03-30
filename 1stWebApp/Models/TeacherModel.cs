@@ -5,10 +5,9 @@ using System.Threading.Tasks;
 
 namespace _1stWebApp.Models
 {
-    public class StudentModel
+    public class TeacherModel
     {
-        public int? Score { get; set; }
         public string Name { get; set; }
-        public int? TeacherId { get; set; }
+        public string Discipline { get; set; }
     }
 }
