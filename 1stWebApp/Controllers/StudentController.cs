@@ -7,9 +7,12 @@ using _1stWebApp.Models;
 using _1stWebApp.Entities;
 using System.Reflection;
 using _1stWebApp.utils.reflect;
+using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 
 namespace _1stWebApp.Controllers
 {
+    [ApiController]
     [Route("api/[controller]")]
     public class StudentController : ControllerBase
     {
@@ -22,15 +25,23 @@ namespace _1stWebApp.Controllers
         [HttpGet("view/{id?}")]
         public async Task<IActionResult> Get(int? id)
         {
-            if (id == null)
+            try
             {
-                var items = db.Students.ToArray();
-                return Ok(items);
-            }
-            else
+                if (id.HasValue)
+                {
+                    var items = await db.Students.AsNoTracking().Include(s => s.Teacher).Where(s => s.Id == id).FirstAsync();
+                    return Ok(items);
+                }
+                else
+                {
+                    var st = await db.Students.AsNoTracking().Include(s => s.Teacher).OrderBy(s => s.Id).ToArrayAsync();
+                    if (st == null) return NotFound();
+                    return Ok(st);
+                }
+            }catch(Exception e)
             {
-                var st = await db.Students.FindAsync(id);
-                return Ok(st);
+                Console.WriteLine(e.Message);
+                return StatusCode(409);
             }
         }
 
@@ -51,13 +62,20 @@ namespace _1stWebApp.Controllers
         }
 
         [HttpPost("create")]
-        public async Task<IActionResult> Create([FromForm] int? score, string name)
+        public async Task<IActionResult> Create([FromForm] int? score, string name, int? teacherId)
         {
-            if (score == null || name == null) return StatusCode(409);
-            var st = new Student { Score = (int)score, Name = name };
-            db.Students.Add(st);
-            await db.SaveChangesAsync();
-            return StatusCode(201, st);
+            try
+            {
+                if (score == null || name == null) return StatusCode(409);
+                var st = new Student { Score = (int)score, Name = name, Teacher = await db.Teachers.FindAsync(teacherId), TeacherId = teacherId };
+                db.Students.Add(st);
+                await db.SaveChangesAsync();
+                return StatusCode(201, st);
+            }catch(Exception e)
+            {
+                Console.WriteLine(e.Message);
+                return StatusCode(409);
+            }
         }
 
         [HttpPut("update/{id}")]
@@ -67,7 +85,7 @@ namespace _1stWebApp.Controllers
             try
             {
                 var teacher = await db.Teachers.FindAsync(model.TeacherId);
-                var st = new Student { Id = id, Name = model.Name, Score = (int)model.Score, Teacher = teacher  };
+                var st = new Student { Id = id, Name = model.Name, Score = (int)model.Score, Teacher = teacher, TeacherId = model.TeacherId  };
                 db.Students.Update(st);
                 await db.SaveChangesAsync();
                 return Ok(st);
@@ -86,8 +104,12 @@ namespace _1stWebApp.Controllers
             {              
                 var st = await db.Students.FindAsync(id);
                 Reflection.UpdateEntity(st,model);
-                Teacher teacher = null;
-                if (model.TeacherId.HasValue) teacher = await db.Teachers.FindAsync(model.TeacherId.Value); 
+                if (model.TeacherId.HasValue)
+                {
+                    Teacher teacher = await db.Teachers.FindAsync(model.TeacherId.Value);
+                    if (teacher != null) st.Teacher = teacher;
+                    st.TeacherId = model.TeacherId;
+                }
                 db.Students.Update(st);
                 await db.SaveChangesAsync();
                 return Ok(st);

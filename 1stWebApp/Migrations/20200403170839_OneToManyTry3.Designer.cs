@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using _1stWebApp;
@@ -9,25 +10,16 @@ using _1stWebApp;
 namespace _1stWebApp.Migrations
 {
     [DbContext(typeof(MyDbContext))]
-    partial class MyDbContextModelSnapshot : ModelSnapshot
+    [Migration("20200403170839_OneToManyTry3")]
+    partial class OneToManyTry3
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn)
                 .HasAnnotation("ProductVersion", "3.1.3")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
-
-            modelBuilder.Entity("_1stWebApp.Entities.Discipline", b =>
-                {
-                    b.Property<string>("Name")
-                        .HasColumnType("text");
-
-                    b.HasKey("Name");
-
-                    b.ToTable("Disciplines");
-                });
 
             modelBuilder.Entity("_1stWebApp.Entities.Student", b =>
                 {
@@ -59,6 +51,9 @@ namespace _1stWebApp.Migrations
                         .HasColumnType("integer")
                         .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
 
+                    b.Property<string>("Discipline")
+                        .HasColumnType("text");
+
                     b.Property<string>("Name")
                         .HasColumnType("text");
 
@@ -67,41 +62,11 @@ namespace _1stWebApp.Migrations
                     b.ToTable("Teachers");
                 });
 
-            modelBuilder.Entity("_1stWebApp.Entities.TeacherDiscipline", b =>
-                {
-                    b.Property<int>("TeacherId")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("DisciplineName")
-                        .HasColumnType("text");
-
-                    b.HasKey("TeacherId", "DisciplineName");
-
-                    b.HasIndex("DisciplineName");
-
-                    b.ToTable("TeacherDiscipline");
-                });
-
             modelBuilder.Entity("_1stWebApp.Entities.Student", b =>
                 {
                     b.HasOne("_1stWebApp.Entities.Teacher", "Teacher")
                         .WithMany("Students")
                         .HasForeignKey("TeacherId");
-                });
-
-            modelBuilder.Entity("_1stWebApp.Entities.TeacherDiscipline", b =>
-                {
-                    b.HasOne("_1stWebApp.Entities.Discipline", "Discipline")
-                        .WithMany("TeacherDisciplines")
-                        .HasForeignKey("DisciplineName")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("_1stWebApp.Entities.Teacher", "Teacher")
-                        .WithMany("TeacherDisciplines")
-                        .HasForeignKey("TeacherId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
                 });
 #pragma warning restore 612, 618
         }

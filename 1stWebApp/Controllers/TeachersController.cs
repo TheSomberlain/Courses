@@ -7,6 +7,7 @@ using _1stWebApp.Models;
 using _1stWebApp.Entities;
 using System.Reflection;
 using _1stWebApp.utils.reflect;
+using Microsoft.EntityFrameworkCore;
 
 namespace _1stWebApp.Controllers
 {
@@ -23,15 +24,21 @@ namespace _1stWebApp.Controllers
         [HttpGet("view/{id?}")]
         public async Task<IActionResult> Get(int? id)
         {
-            if (id == null)
+            try
             {
-                var items = db.Teachers.ToArray();
-                return Ok(items);
+                var teacher = await db.Teachers.AsNoTracking()
+                        .Include(t => t.Students)
+                        .Include(t => t.TeacherDisciplines)
+                        .Select(x=>new {x.Id,students = x.Students.OrderBy(z=>z.Id).ToArray(),
+                                                    discipline = x.TeacherDisciplines.Select(z=>z.Discipline)})
+                        .Where(t => t.Id == id || id ==null).ToArrayAsync();
+                if (teacher == null) return NotFound();
+                return Ok(teacher);
             }
-            else
+            catch (Exception e)
             {
-                var st = await db.Teachers.FindAsync(id);
-                return Ok(st);
+                Console.WriteLine(e.Message);
+                return StatusCode(409);
             }
         }
 
@@ -53,10 +60,10 @@ namespace _1stWebApp.Controllers
         }
 
         [HttpPost("create")]
-        public async Task<IActionResult> Create([FromForm] string discipline, string name)
+        public async Task<IActionResult> Create([FromForm] string name)
         {
-            if (discipline == null || name == null) return StatusCode(409);
-            var st = new Teacher { Discipline = discipline, Name = name };
+            if (name == null) return StatusCode(409);
+            var st = new Teacher { Name = name };
             db.Teachers.Add(st);
             await db.SaveChangesAsync();
             return StatusCode(201, st);
@@ -65,10 +72,10 @@ namespace _1stWebApp.Controllers
         [HttpPut("update/{id}")]
         public async Task<IActionResult> Update(int id, [FromForm] TeacherModel model)
         {
-            if (model == null || model.Discipline == null || model.Name == null) return StatusCode(409);
+            if (model?.Name == null) return StatusCode(409);
             try
             {
-                var st = new Teacher { Id = id, Name = model.Name, Discipline = model.Discipline };
+                var st = new Teacher { Id = id, Name = model.Name };
                 db.Teachers.Update(st);
                 await db.SaveChangesAsync();
                 return Ok(st);

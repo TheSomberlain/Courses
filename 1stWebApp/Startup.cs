@@ -9,10 +9,13 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Newtonsoft.Json;
-using _1stWebApp.StudentsMiddleware;
 using Microsoft.Extensions.Configuration;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity;
+using System.Text;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+
 
 namespace _1stWebApp
 {
@@ -31,7 +34,13 @@ namespace _1stWebApp
                 options.UseNpgsql("Host = localhost; Database = postgres; Username = postgres; Password = postgres");
             });
             services.AddMvc();
-            services.AddControllers();
+            services.AddControllers().AddNewtonsoftJson(options =>
+                {
+                    options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
+                    options.SerializerSettings.NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore;
+                }
+            );
+
         }
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
@@ -49,7 +58,7 @@ namespace _1stWebApp
                 }
                 catch(Exception ex)
                 {
-                    await context.Response.WriteAsync("Error");
+                    await context.Response.WriteAsync(ex.Message);
 
                 }              
             });
@@ -60,11 +69,6 @@ namespace _1stWebApp
             });
             app.Run(async (context) =>
             {
-                
-                /*st.add(new Student(12, "Kolya"));
-                st.add(new Student(13, "Vasya"));
-                st.add(new Student(14, "Lyosha"));
-                st.add(new Student(15, "Miha"));*/
                 await context.Response.WriteAsync("smmth");
             });
 
