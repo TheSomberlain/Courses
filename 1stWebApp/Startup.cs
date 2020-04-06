@@ -13,6 +13,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
 using System.Text;
+using _1stWebApp.Entities;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 
@@ -40,7 +41,21 @@ namespace _1stWebApp
                     options.SerializerSettings.NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore;
                 }
             );
-
+            services.AddIdentity<User, IdentityRole>(config =>
+                {
+                    config.Password.RequireLowercase = true;
+                    config.Password.RequireUppercase = false;
+                    config.Password.RequireNonAlphanumeric = false;
+                    config.Password.RequireDigit = false;
+                    config.Password.RequiredLength = 5;
+                })
+                .AddEntityFrameworkStores<MyDbContext>()
+                .AddDefaultTokenProviders();
+            services.ConfigureApplicationCookie(conf =>
+            {
+                conf.Cookie.Name = "Identity.Cookie";
+                conf.LoginPath = "/api/auth/login";
+            });
         }
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
@@ -50,6 +65,8 @@ namespace _1stWebApp
             }
 
             app.UseRouting();
+            app.UseAuthentication();
+            app.UseAuthorization();
 
             app.Use(async (context, next) => {
                 try

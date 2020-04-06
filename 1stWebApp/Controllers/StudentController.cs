@@ -7,6 +7,7 @@ using _1stWebApp.Models;
 using _1stWebApp.Entities;
 using System.Reflection;
 using _1stWebApp.utils.reflect;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 
@@ -22,6 +23,7 @@ namespace _1stWebApp.Controllers
             db = context;
         }
 
+        [Authorize]
         [HttpGet("view/{id?}")]
         public async Task<IActionResult> Get(int? id)
         {
@@ -50,6 +52,7 @@ namespace _1stWebApp.Controllers
             }
         }
 
+        [Authorize]
         [HttpDelete("delete/{id?}")]
         public async Task<IActionResult> Remove(int id)
         {

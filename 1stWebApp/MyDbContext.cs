@@ -1,13 +1,18 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using _1stWebApp.Entities;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 namespace _1stWebApp
 {
-    public class MyDbContext : DbContext
+    public class MyDbContext : IdentityDbContext<User>
     {
         public MyDbContext(DbContextOptions options) : base(options)
         {
         }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+
+            base.OnModelCreating(modelBuilder);
+
             modelBuilder.Entity<Entities.Student>()
                 .HasOne(s => s.Teacher)
                 .WithMany(g => g.Students)
