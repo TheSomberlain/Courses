@@ -29,12 +29,17 @@ namespace _1stWebApp.Controllers
             {
                 if (id.HasValue)
                 {
-                    var items = await db.Students.AsNoTracking().Include(s => s.Teacher).Where(s => s.Id == id).FirstAsync();
+                    var items = await db.Students.AsNoTracking()
+                        .Include(s => s.Teacher)
+                        .Where(s => s.Id == id).FirstAsync();
                     return Ok(items);
                 }
                 else
                 {
-                    var st = await db.Students.AsNoTracking().Include(s => s.Teacher).OrderBy(s => s.Id).ToArrayAsync();
+                    var st = await db.Students
+                        .AsNoTracking()
+                        .Include(s => s.Teacher)
+                        .OrderBy(s => s.Id).ToArrayAsync();
                     if (st == null) return NotFound();
                     return Ok(st);
                 }

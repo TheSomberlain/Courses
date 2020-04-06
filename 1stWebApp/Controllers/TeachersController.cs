@@ -29,7 +29,7 @@ namespace _1stWebApp.Controllers
                 var teacher = await db.Teachers.AsNoTracking()
                         .Include(t => t.Students)
                         .Include(t => t.TeacherDisciplines)
-                        .Select(x=>new {x.Id,students = x.Students.OrderBy(z=>z.Id).ToArray(),
+                        .Select(x=>new {x.Id,x.Name,students = x.Students.OrderBy(z=>z.Id).ToArray(),
                                                     discipline = x.TeacherDisciplines.Select(z=>z.Discipline)})
                         .Where(t => t.Id == id || id ==null).ToArrayAsync();
                 if (teacher == null) return NotFound();
@@ -49,6 +49,17 @@ namespace _1stWebApp.Controllers
             {
                 var st = await db.Teachers.FindAsync(id);
                 db.Remove(st);
+                var student = await db.Students.Where(s => s.TeacherId == id).ToArrayAsync();
+                foreach (var item in student)
+                {
+                    item.TeacherId = null;
+                }
+                var disciplineTeacher = await
+                    db.TeacherDisciplines.Where(z => z.TeacherId == id).Select(x => x.DisciplineName).ToArrayAsync();
+                foreach (var item in disciplineTeacher)
+                {
+                    db.TeacherDisciplines.Remove(await db.TeacherDisciplines.FindAsync(id, item));
+                }    
                 await db.SaveChangesAsync();
                 return Ok();
             }
@@ -88,7 +99,7 @@ namespace _1stWebApp.Controllers
         }
 
         [HttpPatch("update/{id}")]
-        public async Task<IActionResult> UpdatePartionally(int id, [FromForm] StudentModel model)
+        public async Task<IActionResult> UpdatePartionally(int id, [FromForm] TeacherModel model)
         {
             if (model == null) return StatusCode(409);
             try

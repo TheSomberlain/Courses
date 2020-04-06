@@ -64,6 +64,14 @@ namespace _1stWebApp.Controllers
                 var checker = await db.Disciplines.FindAsync(name);
                 if (checker == null) return StatusCode(405);
                 db.Disciplines.Remove(checker);
+                var teacherIds = await db.TeacherDisciplines
+                    .Where(x => x.DisciplineName == name)
+                    .Select(z => z.TeacherId)
+                    .ToArrayAsync();
+                foreach (var item in teacherIds)
+                {
+                    db.Remove(new TeacherDiscipline(){TeacherId = item, DisciplineName = name});
+                }
                 await db.SaveChangesAsync();
                 return Ok(checker);
             }

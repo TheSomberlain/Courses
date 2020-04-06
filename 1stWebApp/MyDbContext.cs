@@ -29,5 +29,6 @@ namespace _1stWebApp
         public DbSet<Entities.Student> Students { get; set; }
         public DbSet<Entities.Teacher> Teachers { get; set; }
         public  DbSet<Entities.Discipline> Disciplines { get; set; }
+        public DbSet<Entities.TeacherDiscipline> TeacherDisciplines { get; set; }
     }
 }

@@ -9,7 +9,6 @@ namespace _1stWebApp.Models
     public class TeacherModel
     {
         public string Name { get; set; }
-        public IEnumerable<Student> Students { get; set; } 
-        public IEnumerable<Discipline> Disciplines { get; set; }
+
     }
 }
